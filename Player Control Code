@@ -1,0 +1,290 @@
+///Controls
+//Get Player Input
+key_right = keyboard_check(vk_right);
+key_left = -keyboard_check(vk_left);
+key_right_released = keyboard_check_released(vk_right);
+key_left_released = keyboard_check_released(vk_left);
+key_up = keyboard_check(vk_up);
+key_down = -keyboard_check(vk_down);
+key_jump = keyboard_check(ord('Z'));
+key_jump_released = !key_jump;
+key_shoot = keyboard_check_pressed(ord('X'));
+key_charge = keyboard_check(ord('X'));
+key_charge_release = keyboard_check_released(ord('X'));
+key_weapon_change = keyboard_check_pressed(ord('A'));
+key_alternate_fire = keyboard_check_pressed(ord('C'));
+//movement direction
+if(key_left) or (hsp < -1)
+{
+sprite_index = spr_player_left;
+}
+
+if(key_right) or (hsp > 1)
+{
+sprite_index = spr_player_right;
+}
+
+//Reaction to Input
+move = key_left + key_right;
+hsp = move * movespeed;
+if(vsp < 10) vsp += grav;
+
+if (place_meeting(x,y+1,obj_wall1)) && jumpready = true
+{
+    vsp = key_jump * -jumpspeed;
+}
+
+if(vsp < 0) && (key_jump_released)
+{
+vsp = max(vsp,-jumpspeed/4)
+}
+if(key_jump_released) jumpready = true;
+
+if(key_jump) jumpready = false;
+
+//Horizontal collision
+if (place_meeting(x+hsp,y,obj_wall1))
+{
+    while(!place_meeting(x+sign(hsp),y,obj_wall1))
+    {
+        x += sign(hsp);
+    }
+    hsp = 0;
+    dash_timer = 0;
+}
+x += hsp
+//Vertical collision
+if (place_meeting(x,y+vsp,obj_wall1))
+{
+    while(!place_meeting(x,y+sign(vsp),obj_wall1))
+    {
+        y += sign(vsp);
+    }
+    vsp = 0;
+}
+
+y += vsp;
+
+//dash mechanics
+dash -= 1;
+dash_timer -= 1;
+
+if(dash <= 0)
+{
+dash = 0;
+}
+
+if(dash_timer <= 0)
+{
+dash_timer = 0;
+dashing = false;
+movespeed = 4;
+}
+
+if((key_right) && dash_timer > 1)
+{
+sprite_index = spr_player_dash_right;
+movespeed = 8;
+}
+
+if((-key_left) && dash_timer > 1)
+{
+sprite_index = spr_player_dash_left;
+movespeed = 8;
+}
+
+
+if(keyboard_check_pressed(vk_left) or keyboard_check_pressed(vk_right))
+{
+if(dash > 0)
+{
+dashing = true;
+dash_timer = 60;
+}
+
+if(dashing = false)
+{
+dash = 10;
+}
+
+}
+
+
+if(key_right_released or key_left_released)
+{
+dash_timer = 0;
+}
+
+
+//Shooting
+//shoot
+if(key_shoot)
+{
+    bullet = instance_create(x,y,obj_bullet)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+bullet.hsp = -10;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+bullet.hsp = 10;
+}
+}
+//charging
+if(key_charge)
+{
+charge += charge_speed;
+if(charge > 20) && (!instance_exists(obj_charge_aura))
+{
+instance_create(x,y,obj_charge_aura)
+}
+}
+
+//charge shot release
+if(key_charge_release) && (charge >= 30)  && (charge <= 60)
+{
+charge_bullet_1 = instance_create(x,y,obj_charge_bullet_1);
+charge = 0;
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+charge_bullet_1.hsp = -10;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+charge_bullet_1.hsp = 10;
+}
+}
+
+if(key_charge_release) & (charge >= 61)  && (charge <= 110)
+{
+charge_bullet_2 = instance_create(x,y,obj_charge_bullet_2)
+charge = 0;
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+charge_bullet_2.hsp = -10;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+charge_bullet_2.hsp = 10;
+}
+}
+
+if(key_charge_release) & (charge >=111)
+{
+charge_bullet_3 = instance_create(x,y,obj_charge_bullet_3)
+charge = 0;
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+charge_bullet_3.hsp = -10;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+charge_bullet_3.hsp = 10;
+}
+}
+
+if(key_charge_release)
+{
+instance_destroy(obj_charge_aura,true)
+
+}
+
+//Weapon Systems
+
+if(key_weapon_change)
+{
+weapon_value += 1;
+}
+
+if((weapon_value) > 4)
+{
+weapon_value = 1;
+}
+
+//weapon firing
+if(key_alternate_fire)
+{
+
+//laser weapon
+if(weapon_value = 1)
+{
+    laser = instance_create(x,y,obj_laser_shot)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+laser.hsp = -20;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+laser.hsp = 20;
+}
+}
+//fire weapon
+if(weapon_value = 2)
+{
+    flameshot = instance_create(x,y,obj_flame_shot)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+flameshot.hsp = -8;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+flameshot.hsp = 8;
+}
+}
+
+
+//ice weapon
+if(weapon_value = 3)
+{
+    icespread = instance_create(x,y,obj_ice_spread)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+icespread.hsp = -12;
+icespread.vsp = -1;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+icespread.hsp = 12;
+icespread.vsp = -1;
+}
+    icespread = instance_create(x,y+3,obj_ice_spread)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+icespread.hsp = -12;
+icespread.vsp = -3;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+icespread.hsp = 12;
+icespread.vsp = -3;
+}
+    icespread = instance_create(x,y-3,obj_ice_spread)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+icespread.hsp = -12;
+icespread.vsp = -5;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+icespread.hsp = 12;
+icespread.vsp = -5;
+}
+}
+
+//force weapon
+if(weapon_value = 4)
+{
+    forcecannon = instance_create(x,y,obj_force_cannon)
+if(sprite_index = spr_player_left) or (sprite_index = spr_player_dash_left)
+{
+forcecannon.hsp = -15;
+}
+if(sprite_index = spr_player_right) or (sprite_index = spr_player_dash_right)
+{
+forcecannon.hsp = 15;
+}
+}
+
+
+
+}
