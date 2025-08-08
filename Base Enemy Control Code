@@ -1,0 +1,45 @@
+///control
+hsp = movespeed;
+vsp += grav;
+firing += 3;
+
+//movement
+if(place_meeting(x+hsp,y,obj_wall1))
+{
+    while(!place_meeting(x+sign(hsp),y,obj_wall1))
+    {
+        x += sign(hsp);
+    }
+    movespeed *= -1;
+}
+if (!place_meeting(x+(16*sign(hsp)),y+0.5,obj_wall1))
+{
+    movespeed *= -1;
+}
+
+x += hsp
+//vertical collision
+if (place_meeting(x,y+vsp,obj_wall1))
+{
+    while(!place_meeting(x,y+sign(vsp),obj_wall1))
+    {
+        y += sign(vsp);
+    }
+    vsp = 0;
+}
+
+
+y += vsp;
+//life
+if(life <= 0)
+{
+instance_destroy();
+}
+
+//shooting
+if(collision_rectangle(x,y,x+200*sign(hsp),y-13,obj_player,false,false)) && firing >= 100
+{
+enembullet = instance_create(x,y,obj_enembullet)
+enembullet. movespeed *= sign(hsp);
+firing = 0;
+}
